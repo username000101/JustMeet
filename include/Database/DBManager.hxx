@@ -16,7 +16,7 @@ namespace justmeet {
     namespace db {
         class DatabaseManager {
         public:
-            struct DatabaseUser {
+            struct DatabaseUser { 
                 enum DatabaseUserGender {
                     MALE   = 0,
                     FEMALE = 1,

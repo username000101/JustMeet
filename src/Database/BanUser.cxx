@@ -12,9 +12,9 @@ bool justmeet::db::DatabaseManager::ban_user(std::int64_t chat_id) {
     }
 
     if (this->check_user(chat_id)) {
-        auto reply = (redisReply*)redisCommand(this->redis_, "hget %d banned", chat_id);
+        auto reply = (redisReply*)redisCommand(this->redis_, "hget %s banned", std::to_string(chat_id).c_str());
         if (reply->type == REDIS_REPLY_NIL) {
-            auto reply2 = (redisReply*)redisCommand(this->redis_, "hset %d banned 1", chat_id);
+            auto reply2 = (redisReply*)redisCommand(this->redis_, "hset %s banned 1", std::to_string(chat_id).c_str());
             if (reply2->type == REDIS_REPLY_INTEGER && reply2->integer > 0) {
                 this->logger_->info("{} ==> {} ==> Banned user",
                                 __PRETTY_FUNCTION__, chat_id);
@@ -32,7 +32,7 @@ bool justmeet::db::DatabaseManager::ban_user(std::int64_t chat_id) {
             return true;
         }
     } else {
-        this->logger_->error("{} ==> {} ==> Can't find user",
+        this->logger_->error("{} ==> {} ==> Can't find the user",
                              __PRETTY_FUNCTION__, chat_id);
         return false;
     }

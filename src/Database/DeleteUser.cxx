@@ -12,7 +12,7 @@ bool justmeet::db::DatabaseManager::delete_user(std::int64_t chat_id) {
     }
 
     if (this->check_user(chat_id)) {
-        auto reply = (redisReply*)redisCommand(this->redis_, "del %d", chat_id);
+        auto reply = (redisReply*)redisCommand(this->redis_, "del %s", std::to_string(chat_id).c_str());
         if (reply->type == REDIS_REPLY_INTEGER)
             if (reply->integer < 1) /* Error(?) */ {
                 this->logger_->error("{} ==> Redis error: ",
