@@ -1,35 +1,55 @@
 #ifndef JUSTMEET_UTILS_STLTYPESREADER_HXX
 #define JUSTMEET_UTILS_STLTYPESREADER_HXX
 
+#include <concepts>
 #include <sstream>
 #include <string>
 
 namespace justmeet {
     namespace utils {
-        template <typename T> struct is_pair : std::false_type {};
-        template <typename T1, typename T2> struct is_pair<std::pair<T1, T2>>
-            : std::true_type {};
-
-        template <typename T> constexpr bool is_pair_v = is_pair<T>::value;
-
-        template <typename ContainerType> class ContainerReader {
-        public:
-            std::string operator()(ContainerType& container) {
-                std::ostringstream stream;
-                bool first = true;
-                stream << "[";
-                for (auto& element : container) {
-                    if (first) {
-                        stream << "\"" << element << "\"";
-                        first = false;
-                        continue;
-                    }
-                    stream << ", \"" << element << "\"";
-                }
-                stream << "]";
-                return stream.str();
-            }
+        template <typename T> concept STLNonPairContainer = requires(T container, typename T::value_type v) {
+            { container.push_back(v) };
         };
+
+        template <STLNonPairContainer ContainerType> std::string container_reader(ContainerType& container){
+            std::ostringstream stream;
+            for (auto& element : container)
+                stream << element << ";";
+            return stream.str();
+        }
+        template <STLNonPairContainer ContainerType> std::string container_reader(ContainerType&& container) {
+            return container_reader<ContainerType>(container);
+        }
+
+        template <STLNonPairContainer ContainerType> ContainerType string_reader(const std::string& str) {
+            std::istringstream stream(str);
+            ContainerType result;
+            std::string buf;
+            while (std::getline(stream, buf, ';')) {
+                if (std::is_same_v<decltype(buf), typename ContainerType::value_type>)
+                    result.push_back(buf);
+                else
+                    result.push_back(typename ContainerType::value_type(buf));
+            }
+            return result;
+        }
+
+        template <STLNonPairContainer OldContainerType, STLNonPairContainer NewContainerType> NewContainerType cast_container
+            (OldContainerType& old_container) {
+            NewContainerType result;
+            for (auto& element : old_container) {
+                if (std::is_same_v<typename NewContainerType::value_type, typename OldContainerType::value_type>)
+                    result.push_back(element);
+                else
+                    result.push_back(typename NewContainerType::value_type(element));
+            }
+            return result;
+        }
+        template <STLNonPairContainer OldContainerType, typename NewContainerType> NewContainerType cast_container
+            (OldContainerType&& old_container) {
+            return cast_container<OldContainerType, NewContainerType>(old_container);
+        }
+
     }
 }
 
