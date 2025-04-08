@@ -1,9 +1,21 @@
 #include "Logic/Handlers/GenericQueryHadnler.hxx"
 
 #include <sstream>
+#include <unordered_map>
+#include <vector>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+
+std::unordered_map<std::string, justmeet::logic::handlers::query::ExecutorSignature> executors;
+
+void justmeet::logic::handlers::query::add_executor(const std::string& command, justmeet::logic::handlers::query::ExecutorSignature executor) {
+    executors[command] = executor;
+}
+
+void justmeet::logic::handlers::query::remove_executor(const std::string& command) {
+    executors[command] = nullptr;
+}
 
 void justmeet::logic::handlers::query::generic_query_handler(TgBot::CallbackQuery::Ptr query) {
     static auto logger = std::make_shared<spdlog::logger>
@@ -19,18 +31,15 @@ void justmeet::logic::handlers::query::generic_query_handler(TgBot::CallbackQuer
     std::string command;
     stream >> command;
 
-    if (command == QRY_LOG) {
-        std::string logmsg;
-        std::string logmsg_buf;
-        while (stream >> logmsg_buf)
-            logmsg += logmsg_buf + " ";
-
-        logger->info("{} ==> [QRY_LOG] [{}]: {}",
-                     __PRETTY_FUNCTION__, query->from->id, logmsg);
-        return;
+    if (executors.count(command) > 0 && executors.at(command)) {
+        logger->log(spdlog::level::debug,
+                    "{} ==> Calling the executor \"{}\"",
+                    __PRETTY_FUNCTION__, command);
+        std::thread executor(executors.at(command), query);
+        executor.detach();
     } else {
-        logger->warn("{} ==> [{}] [{}]: Unknown command",
-                     __PRETTY_FUNCTION__, command, query->from->id);
-        return;
+        logger->log(spdlog::level::warn,
+                    "{} ==> Not found valid executor for command \"{}\"",
+                    __PRETTY_FUNCTION__, command);
     }
 }

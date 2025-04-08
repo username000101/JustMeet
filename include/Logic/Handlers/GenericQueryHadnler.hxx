@@ -16,6 +16,10 @@ namespace justmeet {
                 const std::string QRY_LIKE = "query_like"; /* For mark users */
                 const std::string QRY_CREATE = "query_create"; /* For creating a profile */
 
+                using ExecutorSignature = void(*)(TgBot::CallbackQuery::Ptr);
+
+                void add_executor(const std::string& command, ExecutorSignature executor);
+                void remove_executor(const std::string& command);
                 void generic_query_handler(TgBot::CallbackQuery::Ptr query);
             }
         }
