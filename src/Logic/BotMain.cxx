@@ -6,6 +6,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <tgbot/tgbot.h>
 
+#include "Logic/Handlers/GenericQueryHadnler.hxx"
+#include "Logic/Handlers/NonCommandMessagesHandler.hxx"
 #include "Logic/Handlers/StartCommand.hxx"
 #include "Runtime/Storage.hxx"
 
@@ -14,7 +16,10 @@ void justmeet::logic::bot_main(const std::string& token) {
         ("Bot", spdlog::sinks_init_list{std::make_shared<spdlog::sinks::stdout_color_sink_mt>()});
     runtime_storage::bot = std::make_shared<TgBot::Bot>(token);
 
+    runtime_storage::bot->getEvents().onNonCommandMessage(logic::handlers::non_command_messages_handler);
+    runtime_storage::bot->getEvents().onCallbackQuery(logic::handlers::query::generic_query_handler);
     runtime_storage::bot->getEvents().onCommand("start", handlers::commands::start);
+
 
     try {
         TgBot::TgLongPoll lpoll(*runtime_storage::bot);
