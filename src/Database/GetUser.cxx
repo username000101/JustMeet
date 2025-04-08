@@ -92,6 +92,8 @@ std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::Databas
                     result.language = static_cast<DatabaseManager::DatabaseUser::DatabaseUserLanguage>(reply->element[i + 1]->integer);
                 else if (std::strcmp(reply->element[i]->str, "city") == 0)
                     result.city = reply->element[i + 1]->str;
+                else if (std::strcmp(reply->element[i]->str, "profile_state") == 0)
+                    result.profile_state = static_cast<DatabaseManager::DatabaseUser::UserProfileState>(reply->element[i + 1]->integer);
                 else if (std::strcmp(reply->element[i]->str, "preferred_ages") == 0)
                     result.preferred_ages = cast_preferred_ages(reply->element[i + 1]->str);
                 else if (std::strcmp(reply->element[i]->str, "preferred_genders") == 0)
