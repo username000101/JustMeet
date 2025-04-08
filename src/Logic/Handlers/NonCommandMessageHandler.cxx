@@ -8,6 +8,4 @@
 void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr message) {
 
         /* Write a non-command message handler */
-        runtime_storage::bot->getApi().sendMessage()
-    }
 }
