@@ -5,7 +5,6 @@
 #include <unicode/unistr.h>
 #include <tgbot/tgbot.h>
 
-#include "Logic/Handlers/GenericQueryHadnler.hxx"
 #include "Runtime/Storage.hxx"
 
 void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
