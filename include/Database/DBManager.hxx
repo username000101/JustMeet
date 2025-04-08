@@ -29,6 +29,20 @@ namespace justmeet {
                     Deutch  = 3,
                 };
 
+                enum UserProfileState {
+                    NONE,
+                    NAME,
+                    AGE,
+                    BIO,
+                    CITY,
+                    LANGUAGE,
+                    GENDER,
+                    PREFERRED_LANGUAGES,
+                    PREFERRED_AGES,
+                    PREFERRED_CITIES,
+                    PREFERRED_GENDERS,
+                };
+
                 std::string tg_first_name;
                 std::string tg_last_name;
 
@@ -41,6 +55,7 @@ namespace justmeet {
                 DatabaseUserGender gender;
                 DatabaseUserLanguage language;
                 std::string city;
+                UserProfileState profile_state;
 
                 std::vector<std::uint16_t> preferred_ages;
                 std::vector<DatabaseUserLanguage> preferred_languages;
@@ -83,6 +98,7 @@ namespace justmeet {
 
             }
 
+            std::optional<std::string> get_field(std::int64_t chat_id, const std::string& field);
             std::optional<DatabaseUser> get_user(std::int64_t chat_id);
             std::optional<DatabaseUser> update_user(DatabaseUser user);
 
@@ -93,6 +109,8 @@ namespace justmeet {
             bool unban_user(std::int64_t chat_id);
 
             bool check_user(std::int64_t chat_id);
+
+            bool check_field(std::int64_t chat_id, const std::string& field);
 
             /*DatabaseUserPreview operator[](std::int64_t chat_id) {
                 if (!this->connection_.is_open())
