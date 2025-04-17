@@ -110,6 +110,8 @@ namespace justmeet {
 
             bool check_user(std::int64_t chat_id);
 
+            bool add_field(std::int64_t chat_id, const std::string& name, const std::string& value);
+            bool delete_field(std::int64_t chat_id, const std::string& name);
             bool check_field(std::int64_t chat_id, const std::string& field);
 
             /*DatabaseUserPreview operator[](std::int64_t chat_id) {
