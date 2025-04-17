@@ -9,6 +9,7 @@ namespace justmeet {
     namespace logic {
         namespace handlers {
             namespace query {
+                const std::string QRY_WARN = "query_warn"; /* For make warnings */
                 const std::string QRY_LOG = "query_log"; /* For making a log messages */
                 const std::string QRY_REPORT = "query_report"; /* For making a report */
                 const std::string QRY_NEXT = "query_next"; /* For viewing a next profile */
