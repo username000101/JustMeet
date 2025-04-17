@@ -16,6 +16,7 @@ find_package(TgBot REQUIRED)
 include_directories(include)
 
 file(GLOB Database "include/Database/*.hxx" "src/Database/*.cxx")
+file(GLOB Executors "include/Logic/Executors/*.hxx" "src/Logic/Executors/*.cxx")
 file(GLOB Handlers "include/Logic/Handlers/*.hxx" "src/Logic/Handlers/*.cxx")
 file(GLOB JustMeet "main.cpp")
 file(GLOB RuntimeStorage "include/Runtime/*.hxx" "src/Runtime/*.cxx")
@@ -25,6 +26,7 @@ file(GLOB Utils "include/Utils/*.hxx" "src/Utils/*.cxx")
 add_executable(JustMeet
     ${JustMeet}
     ${Database}
+    ${Executors}
     ${Handlers}
     ${RuntimeStorage}
     ${Logic}
