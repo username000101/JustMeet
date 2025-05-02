@@ -11,7 +11,6 @@ find_package(Boost CONFIG REQUIRED COMPONENTS system)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
 find_package(hiredis REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(TgBot REQUIRED)
 
 include_directories(include)
 
@@ -33,6 +32,9 @@ add_executable(JustMeet
     ${Utils}
 )
 
+add_subdirectory(third_party/tgbot-cpp)
+target_include_directories(JustMeet PUBLIC third_party/tgbot-cpp/include)
+
 if (NOT DEFINED TOKEN)
     message(FATAL_ERROR "You need to specify the TOKEN variable")
 endif()
@@ -46,6 +48,6 @@ target_link_libraries(JustMeet PRIVATE
     ${ICU_LIBRARY}
     hiredis::hiredis
     spdlog::spdlog
-    TgBot::TgBot
+    TgBot
     hiredis
 )
