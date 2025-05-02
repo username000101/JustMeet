@@ -1,7 +1,9 @@
 #include "Database/DBManager.hxx"
 
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
+#include <ranges>
 #include <string>
 #include <optional>
 
@@ -22,7 +24,7 @@ using cast_media_rt = std::vector<std::filesystem::path>;
 cast_pref_ages_rt cast_preferred_ages(const std::string& str_preferred_ages) {
     cast_pref_ages_rt result;
     auto casted = string_reader<std::vector<std::string>>(str_preferred_ages);
-    std::for_each(casted.begin(), casted.end(), [&result](auto&& value) {
+    std::ranges::for_each(casted, [&result](auto&& value) {
         result.push_back(static_cast<std::uint16_t>(std::stoi(value)));
     });
     return result;
