@@ -30,7 +30,6 @@ void justmeet::logic::bot_main(const std::string& token) {
             lpoll.start();
     } catch (TgBot::TgException& tgerr) {
         logger->critical("{} ==> Exception received: {}",
-                      __PRETTY_FUNCTION__,
-                      tgerr.what());
+                         __PRETTY_FUNCTION__, tgerr.what());
     }
 }
