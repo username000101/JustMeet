@@ -9,13 +9,13 @@ namespace justmeet {
     namespace logic {
         namespace handlers {
             namespace query {
-                const std::string QRY_WARN = "query_warn"; /* For make warnings */
-                const std::string QRY_LOG = "query_log"; /* For making a log messages */
-                const std::string QRY_REPORT = "query_report"; /* For making a report */
-                const std::string QRY_NEXT = "query_next"; /* For viewing a next profile */
-                const std::string QRY_BACK = "query_back"; /* For viewving a previous profile */
-                const std::string QRY_LIKE = "query_like"; /* For mark users */
-                const std::string QRY_CREATE = "query_create"; /* For creating a profile */
+                constexpr std::string QRY_WARN = "qry_wrn"; /* For make warnings */
+                constexpr std::string QRY_LOG = "qry_log"; /* For making a log messages */
+                constexpr std::string QRY_REPORT = "qry_rep"; /* For making a report */
+                constexpr std::string QRY_NEXT = "qry_nxt"; /* For viewing a next profile */
+                constexpr std::string QRY_BACK = "qry_bck"; /* For viewving a previous profile */
+                constexpr std::string QRY_LIKE = "qry_lke"; /* For mark users */
+                constexpr std::string QRY_CREATE = "qry_crt"; /* For creating a profile */
 
                 using ExecutorSignature = void(*)(TgBot::CallbackQuery::Ptr);
 
@@ -27,4 +27,4 @@ namespace justmeet {
     }
 }
 
-#endif // JUSTMEET_LOGIC_HANDLERS_NONCOMMANDMESSAGESHANDLER_HXX
+#endif // JUSTMEET_LOGIC_HANDLERS_GENERICQUERYHANDLER_HXX
