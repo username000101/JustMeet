@@ -28,7 +28,7 @@ void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
     if (!database->check_user(message->from->id)) {
         auto button_create_profile = std::make_shared<TgBot::InlineKeyboardButton>();
         button_create_profile->text = "Создать профиль";
-        button_create_profile->callbackData = query::QRY_WARN + " this part is not implemented now :(";
+        button_create_profile->callbackData = query::QRY_CREATE;
 
         keyboard->inlineKeyboard.push_back({button_create_profile});
         bot->getApi().sendMessage(message->chat->id, "Привет, " + message->from->firstName + "! Эта часть ещё в разработке...", nullptr, reply_parameters, keyboard);
