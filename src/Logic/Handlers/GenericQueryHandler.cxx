@@ -7,6 +7,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "Runtime/Storage.hxx"
+#include "Logic/Executors/CreateProfile.hxx"
 
 std::unordered_map<std::string, justmeet::logic::handlers::query::ExecutorSignature> executors = {
     {justmeet::logic::handlers::query::QRY_WARN, [] (TgBot::CallbackQuery::Ptr query) {
@@ -20,6 +21,8 @@ std::unordered_map<std::string, justmeet::logic::handlers::query::ExecutorSignat
                      __PRETTY_FUNCTION__, query->data.substr(justmeet::logic::handlers::query::QRY_LOG.length() + 1));
         }
     },
+
+    {justmeet::logic::handlers::query::QRY_CREATE, justmeet::logic::executors::create_profile},
 
     {justmeet::logic::handlers::query::QRY_REPORT, [] (TgBot::CallbackQuery::Ptr query) {
 #ifndef REPORT_HANDLER_CHAT_ID
@@ -35,11 +38,11 @@ std::unordered_map<std::string, justmeet::logic::handlers::query::ExecutorSignat
 };
 
 void justmeet::logic::handlers::query::add_executor(const std::string& command, justmeet::logic::handlers::query::ExecutorSignature executor) {
-    executors[command] = executor;
+    ::executors[command] = executor;
 }
 
 void justmeet::logic::handlers::query::remove_executor(const std::string& command) {
-    executors[command] = nullptr;
+    ::executors[command] = nullptr;
 }
 
 void justmeet::logic::handlers::query::generic_query_handler(TgBot::CallbackQuery::Ptr query) {
@@ -56,11 +59,11 @@ void justmeet::logic::handlers::query::generic_query_handler(TgBot::CallbackQuer
     std::string command;
     stream >> command;
 
-    if (executors.count(command) > 0 && executors.at(command)) {
+    if (::executors.count(command) > 0 && ::executors.at(command)) {
         logger->log(spdlog::level::debug,
                     "{} ==> Calling the executor \"{}\"",
                     __PRETTY_FUNCTION__, command);
-        std::thread executor(executors.at(command), query);
+        std::thread executor(::executors.at(command), query);
         executor.detach();
     } else {
         logger->log(spdlog::level::warn,
