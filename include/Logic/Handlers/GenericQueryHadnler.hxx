@@ -16,6 +16,9 @@ namespace justmeet {
                 constexpr std::string QRY_BACK = "qry_bck"; /* For viewving a previous profile */
                 constexpr std::string QRY_LIKE = "qry_lke"; /* For mark users */
                 constexpr std::string QRY_CREATE = "qry_crt"; /* For creating a profile */
+                constexpr std::string QRY_SET = "qry_set"; /* For setting values in the database */
+                constexpr std::string QRY_GET = "qry_get"; /* For getting values from the database */
+                constexpr std::string QRY_DELETE = "qry_del"; /* For deleting values from the database */
 
                 using ExecutorSignature = void(*)(TgBot::CallbackQuery::Ptr);
 
