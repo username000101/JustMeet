@@ -2,15 +2,16 @@
 
 #include <string>
 
-#include <unicode/unistr.h>
 #include <tgbot/tgbot.h>
 
+#include "Logic/Executors/CreateProfile.hxx"
 #include "Logic/Handlers/GenericQueryHadnler.hxx"
 #include "Runtime/Storage.hxx"
 
 void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
     using runtime_storage::bot;
     using runtime_storage::database;
+    using executors::CreateProfileStep;
 
     if (!message)
         return;
@@ -25,7 +26,7 @@ void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
     button_support->url = "https://t.me/meetx_discussion";
     keyboard->inlineKeyboard.push_back({button_support});
 
-    if (!database->check_user(message->from->id)) {
+    if (auto value = database->get_field(message->from->id, "current_profile_create_step"); !value.has_value() || (value.has_value() && std::stoi(value.value()) != CreateProfileStep::END)) {
         auto button_create_profile = std::make_shared<TgBot::InlineKeyboardButton>();
         button_create_profile->text = "Создать профиль";
         button_create_profile->callbackData = query::QRY_CREATE;
