@@ -12,9 +12,9 @@ void justmeet::logic::executors::create_profile(TgBot::CallbackQuery::Ptr query)
     using runtime_storage::bot;
     using handlers::query::QRY_WARN;
 
-    auto current_step = database->get_field(query->message->from->id, "current_profile_create_step");
+    auto current_step = database->get_field(query->message->chat->id, "current_profile_create_step");
     if (!current_step.has_value()) {
-        database->add_field(query->message->from->id, "current_profile_create_step", std::to_string(NAME));
+        database->add_field(query->message->chat->id, "current_profile_create_step", std::to_string(NAME));
         return create_profile(query);
     }
 
@@ -30,10 +30,18 @@ void justmeet::logic::executors::create_profile(TgBot::CallbackQuery::Ptr query)
             bot->getApi().editMessageText("И так, введи своё имя", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
             break;
         case AGE:
-            bot->getApi().editMessageText("Класс, а теперь введи свой возраст", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
+            bot->getApi().editMessageText("А теперь введи свой возраст", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
             break;
         case BIO:
-            bot->getApi().editMessageText("Замечательно, теперь напиши немного о себе(ограничением является лишь длина сообщения тг, так что.. пиши свободно, но старайся придерживаться главной мысли)", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
+            bot->getApi().editMessageText("Теперь напиши немного о себе(ограничением является лишь длина сообщения тг, так что.. пиши свободно, но старайся придерживаться главной мысли)", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
+            break;
+        case CITY:
+            bot->getApi().editMessageText("А сейчас, пожалуйста, перечисли(через пробел) возраста, которые ты предпочитаешь(люди таких возрастов будут чаще попадаться)", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
+            break;
+        default:
+            bot->getApi().answerCallbackQuery(query->id, "Ничего не произошло :(", true);
             break;
     }
+
+    database->add_field(query->message->chat->id, "last_msg_query_id", std::to_string(query->message->messageId));
 }
