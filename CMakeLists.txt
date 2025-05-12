@@ -51,3 +51,13 @@ target_link_libraries(JustMeet PRIVATE
     TgBot
     hiredis
 )
+
+if (NOT DEFINED FILES_FOLDER)
+    if (WIN32)
+        target_compile_definitions(JustMeet PRIVATE FILES_FOLDER="C:\\ProgramData\\MeetX")
+    elseif (UNIX)
+        target_compile_definitions(JustMeet PRIVATE FILES_FOLDER="/etc/MeetX")
+    elseif (ANDROID)
+        target_compile_definitions(JustMeet PRIVATE FILES_FOLDER="$ENV{HOME}/MeetX")
+    endif()
+endif()
