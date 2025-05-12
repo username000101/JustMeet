@@ -6,9 +6,10 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <tgbot/tgbot.h>
 
-#include "Logic/Handlers/GenericQueryHadnler.hxx"
-#include "Logic/Handlers/NonCommandMessagesHandler.hxx"
 #include "Logic/Handlers/Commands.hxx"
+#include "Logic/Handlers/GenericQueryHadnler.hxx"
+#include "Utils/Restart.hxx"
+#include "Logic/Handlers/NonCommandMessagesHandler.hxx"
 #include "Runtime/Storage.hxx"
 
 void justmeet::logic::bot_main(const std::string& token) {
@@ -20,6 +21,8 @@ void justmeet::logic::bot_main(const std::string& token) {
     runtime_storage::bot->getEvents().onCallbackQuery(handlers::query::generic_query_handler);
     runtime_storage::bot->getEvents().onCommand("start", handlers::commands::start);
 
+    if (runtime_storage::database->get_field(0, "safe_mode").has_value())
+        spdlog::info("Running in safe mode! Some functions(like reply_parameters) are disabled");
 
     try {
         TgBot::TgLongPoll lpoll(*runtime_storage::bot);
@@ -29,7 +32,10 @@ void justmeet::logic::bot_main(const std::string& token) {
         while (true)
             lpoll.start();
     } catch (TgBot::TgException& tgerr) {
-        logger->critical("{} ==> Exception received: {}",
+        logger->critical("{} ==> Exception received: {}\nTrying to restart(in safe mode(?))...",
                          __PRETTY_FUNCTION__, tgerr.what());
+        if (!runtime_storage::database->get_field(0, "safe_mode").has_value())
+            runtime_storage::database->add_field(0, "safe_mode", "1");
+        utils::restart();
     }
 }
