@@ -1,5 +1,7 @@
 #include "Logic/Handlers/NonCommandMessagesHandler.hxx"
 
+#include <algorithm>
+#include <ranges>
 #include <memory>
 
 #include <spdlog/spdlog.h>
@@ -7,6 +9,7 @@
 #include "Logic/Executors/CreateProfile.hxx"
 #include "Logic/Handlers/GenericQueryHadnler.hxx"
 #include "Runtime/Storage.hxx"
+#include "Utils/STLTypes.hxx"
 
 void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr message) {
     using runtime_storage::bot;
@@ -95,7 +98,24 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
         }
 
         case CreateProfileStep::PREFERRED_AGES: {
+            database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::PREFERRED_CITIES));
+            std::vector<int> preferred_ages;
+            std::string age_buffer, errors_buffer;
+            std::istringstream stream(message->text);
+            while (std::getline(stream, age_buffer, ' ')) {
+                try {
+                    preferred_ages.push_back(std::stoi(age_buffer));
+                } catch (std::invalid_argument& casterr) {
+                    errors_buffer += "Ошибка в числе \"" + age_buffer + "\": похоже, что это не число(оно будет пропущено)\n";
+                }
+            }
 
+            database->add_field(message->from->id, "preferred_ages", utils::container_reader<decltype(preferred_ages)>(preferred_ages));
+            if (!errors_buffer.empty())
+                if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                    bot->getApi().editMessageText(errors_buffer, message->chat->id, std::stoi(value.value()));
+                else bot->getApi().sendMessage(message->chat->id, errors_buffer, nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            break;
         }
     }
 }
