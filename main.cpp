@@ -4,6 +4,7 @@
 
 #include "Logic/Bot.hxx"
 #include "Database/DBManager.hxx"
+#include "Utils/FS.hxx"
 #include "Runtime/Storage.hxx"
 
 int main() {
@@ -11,6 +12,7 @@ int main() {
     using justmeet::runtime_storage::bot;
     using justmeet::runtime_storage::database;
     database = std::make_shared<justmeet::db::DatabaseManager>();
+    utils::fscheck();
     justmeet::logic::bot_main();
     return 0;
 }
