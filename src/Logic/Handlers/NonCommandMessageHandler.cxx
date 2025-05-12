@@ -32,25 +32,70 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
         button__create_profile->text = "Создать профиль";
         button__create_profile->callbackData = QRY_CREATE;
         keyboard->inlineKeyboard.push_back({button__create_profile});
-        bot->getApi().sendMessage(message->chat->id, "У тебя нет текущих задач, хочешь что-нибудь сделать/отключить это сообщение?", nullptr, reply_parameters, keyboard);
+        bot->getApi().sendMessage(message->chat->id, "У тебя нет текущих задач, хочешь что-нибудь сделать/отключить это сообщение?", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters), keyboard);
         return;
     }
 
     switch (std::stoi(current_step.value())) {
         default: {
             spdlog::warn("Unknown switch((justmeet::logic::executors::CreateProfileStep)): {}", current_step.value());
-            bot->getApi().editMessageText("Ого, такого варианта(switch((justmeet::logic::executors::CreateProfileStep)))", message->chat->id, message->messageId);
+            if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                bot->getApi().editMessageText("Ого, такого варианта(switch((justmeet::logic::executors::CreateProfileStep))) нет", message->chat->id, std::stoi(value.value()));
+            else
+                bot->getApi().sendMessage(message->chat->id, "Ого, такого варианта(switch((justmeet::logic::executors::CreateProfileStep))) нет", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
             break;
         }
         case CreateProfileStep::NAME: {
             database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::AGE));
             database->add_field(message->from->id, "name", message->text);
-            bot->getApi().editMessageText("Отлично, " + message->text + ", приятно познакомиться. Теперь напиши свой возраст", message->chat->id, message->messageId, "", "", nullptr);
+
+            bot->getApi().deleteMessage(message->chat->id, message->messageId);
+
+            if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                bot->getApi().editMessageText("Отлично, " + message->text + ", приятно познакомиться. Теперь напиши свой возраст", message->chat->id, std::stoi(value.value()));
+            else
+                bot->getApi().sendMessage(message->chat->id, "Отлично, " + message->text + ", приятно познакомиться. Теперь напиши свой возраст", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
             break;
         }
         case CreateProfileStep::AGE: {
             database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::BIO));
             database->add_field(message->from->id, "age", message->text);
+
+            bot->getApi().deleteMessage(message->chat->id, message->messageId);
+
+            if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                bot->getApi().editMessageText("Ого, а сейчас можешь написать о себе(ограничением является лишь длина сообщения тг, так что.. пиши свободно, но старайся придерживаться главной мысли)", message->chat->id, std::stoi(value.value()));
+            else
+                bot->getApi().sendMessage(message->chat->id, "Ого, а сейчас можешь написать о себе(ограничением является лишь длина сообщения тг, так что.. пиши свободно, но старайся придерживаться главной мысли)", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            break;
+        }
+        case CreateProfileStep::BIO: {
+            database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::CITY));
+            database->add_field(message->from->id, "bio", message->text);
+
+            bot->getApi().deleteMessage(message->chat->id, message->messageId);
+
+            if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                bot->getApi().editMessageText("Охты, ну а теперь напиши свой город(в идеале точное название, например: не Спб, а Санкт-Питербург, или что-то в этом роде)", message->chat->id, std::stoi(value.value()));
+            else
+                bot->getApi().sendMessage(message->chat->id, "Охты, ну а теперь напиши свой город(в идеале точное название, например: не Спб, а Санкт-Питербург, или что-то в этом роде)", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            break;
+        }
+        case CreateProfileStep::CITY: {
+            database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::PREFERRED_AGES));
+            database->add_field(message->from->id, "city", message->text);
+
+            bot->getApi().deleteMessage(message->chat->id, message->messageId);
+
+            if (auto value = database->get_field(message->chat->id,  "last_msg_query_id"); value.has_value())
+                bot->getApi().editMessageText("Окей, учтём. А сейчас, пожалуйста, перечисли(через пробел) возраста, которые ты предпочитаешь(люди таких возрастов будут чаще попадаться)", message->chat->id, std::stoi(value.value()));
+            else
+                bot->getApi().sendMessage(message->chat->id, "Окей, учтём. А сейчас, пожалуйста, перечисли(через пробел) возраста, которые ты предпочитаешь(люди таких возрастов будут чаще попадаться)", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            break;
+        }
+
+        case CreateProfileStep::PREFERRED_AGES: {
+
         }
     }
 }

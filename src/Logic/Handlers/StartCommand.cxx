@@ -32,14 +32,14 @@ void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
         button_create_profile->callbackData = query::QRY_CREATE;
 
         keyboard->inlineKeyboard.push_back({button_create_profile});
-        bot->getApi().sendMessage(message->chat->id, "Привет, " + message->from->firstName + "! Эта часть ещё в разработке...", nullptr, reply_parameters, keyboard);
+        bot->getApi().sendMessage(message->chat->id, "Привет, " + message->from->firstName + "! Эта часть ещё в разработке...", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters), keyboard);
     } else {
         auto user = database->get_user(message->from->id);
         if (!user.has_value())
-            bot->getApi().sendMessage(message->chat->id, "Привет, незвестный пользователь(вероятно, ошибка redis)! Эта часть ещё в разработке...", nullptr, reply_parameters, keyboard);
+            bot->getApi().sendMessage(message->chat->id, "Привет, незвестный пользователь(вероятно, ошибка redis)! Эта часть ещё в разработке...", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters), keyboard);
         else {
             const auto& user_value = user.value();
-            bot->getApi().sendMessage(message->chat->id, "Привет, " + (user_value.name.empty() ? "пользователь без имени" : user_value.name) + "! Эта часть ещё в разработке...", nullptr, reply_parameters, keyboard);
+            bot->getApi().sendMessage(message->chat->id, "Привет, " + (user_value.name.empty() ? "пользователь без имени" : user_value.name) + "! Эта часть ещё в разработке...", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters), keyboard);
         }
     }
 }
