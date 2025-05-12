@@ -10,13 +10,13 @@ bool justmeet::db::DatabaseManager::add_field(std::int64_t chat_id, const std::s
 
     if (reply->type == REDIS_REPLY_INTEGER) {
         this->logger_->log(spdlog::level::info,
-                           "{} ==> Added field to key {}: {}",
-                           __PRETTY_FUNCTION__, chat_id, value);
+                           "{} ==> Added field to key {}: {}: {}",
+                           __PRETTY_FUNCTION__, chat_id, name, value);
         return true;
     } else {
         this->logger_->log(spdlog::level::warn,
-                           "{} ==> Failed to add field to key {}: redisReply::type is {}",
-                           __PRETTY_FUNCTION__, chat_id, reply->type);
+                           "{} ==> Failed to add field to key {}: {}: {}: redisReply::type is {}",
+                           __PRETTY_FUNCTION__, chat_id, name, value, reply->type);
         return false;
     }
 }
