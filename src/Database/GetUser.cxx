@@ -23,7 +23,7 @@ using cast_media_rt = std::vector<std::filesystem::path>;
 
 cast_pref_ages_rt cast_preferred_ages(const std::string& str_preferred_ages) {
     cast_pref_ages_rt result;
-    auto casted = string_reader<std::vector<std::string>>(str_preferred_ages);
+    auto casted = string_reader(str_preferred_ages);
     std::ranges::for_each(casted, [&result](auto&& value) {
         result.push_back(static_cast<std::uint16_t>(std::stoi(value)));
     });
@@ -32,7 +32,7 @@ cast_pref_ages_rt cast_preferred_ages(const std::string& str_preferred_ages) {
 
 cast_pref_genders_rt cast_preferred_genders(const std::string& str_preferred_genders) {
     cast_pref_genders_rt result;
-    auto casted = string_reader<std::vector<std::string>>(str_preferred_genders);
+    auto casted = string_reader(str_preferred_genders);
     std::for_each(casted.begin(), casted.end(), [&result](auto&& value) {
         result.push_back(static_cast<DatabaseManager::DatabaseUser::DatabaseUserGender>(std::stoi(value)));
     });
@@ -41,7 +41,7 @@ cast_pref_genders_rt cast_preferred_genders(const std::string& str_preferred_gen
 
 cast_pref_langs_rt cast_preferred_languages(const std::string& str_preferred_languages) {
     cast_pref_langs_rt result;
-    auto casted = string_reader<std::vector<std::string>>(str_preferred_languages);
+    auto casted = string_reader(str_preferred_languages);
     std::for_each(casted.begin(), casted.end(), [&result](auto&& value) {
         result.push_back(static_cast<DatabaseManager::DatabaseUser::DatabaseUserLanguage>(std::stoi(value)));
     });
@@ -49,12 +49,12 @@ cast_pref_langs_rt cast_preferred_languages(const std::string& str_preferred_lan
 }
 
 cast_pref_cities_rt cast_preferred_cities(const std::string& str_preferred_cities) {
-    return string_reader<std::vector<std::string>>(str_preferred_cities);
+    return string_reader(str_preferred_cities);
 }
 
 cast_media_rt cast_media(const std::string& str_media) {
     cast_media_rt result;
-    auto casted = string_reader<std::vector<std::string>>(str_media);
+    auto casted = string_reader(str_media);
     std::for_each(casted.begin(), casted.end(), [&result](auto&& value) {
         result.push_back(std::filesystem::path(value));
     });
