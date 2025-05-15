@@ -21,16 +21,12 @@ namespace justmeet {
             return container_reader<ContainerType>(container);
         }
 
-        template <STLNonPairContainer ContainerType> ContainerType string_reader(const std::string& str) {
+        inline std::vector<std::string> string_reader(const std::string& str) {
             std::istringstream stream(str);
-            ContainerType result;
+            std::vector<std::string> result;
             std::string buf;
-            while (std::getline(stream, buf, ';')) {
-                if (std::is_same_v<decltype(buf), typename ContainerType::value_type>)
-                    result.push_back(buf);
-                else
-                    result.push_back(typename ContainerType::value_type(buf));
-            }
+            while (std::getline(stream, buf, ';'))
+                result.push_back(buf);
             return result;
         }
 
