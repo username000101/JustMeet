@@ -36,14 +36,13 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
         auto preferred_cities = container_reader<v_str>(user.preferred_cities);
         auto media = container_reader<v_str>(cast_container<v_path, v_str>(user.media));
 
-        const char* format = "hset %s tg_first_name %s tg_last_name %s username %s name %s age %d gender %d bio %s language %d city %s profile_state %d preferred_ages %s preferred_genders %s preferred_languages %s preferred_cities %s media %s";
+        const char* format = "hset %s tg_first_name %s tg_last_name %s name %s age %d gender %d bio %s language %d city %s profile_state %d preferred_ages %s preferred_genders %s preferred_languages %s preferred_cities %s media %s";
 
         redisReply* reply = (redisReply*)redisCommand(this->redis_,
                                                         format,
-                                                        std::to_string(user.chat_id).c_str(),
+                                                        ("user:" + std::to_string(user.chat_id)).c_str(),
                                                         user.tg_first_name.c_str(),
                                                         user.tg_last_name.c_str(),
-                                                        user.username.c_str(),
                                                         user.name.c_str(),
                                                         user.age,
                                                         static_cast<int>(user.gender),
