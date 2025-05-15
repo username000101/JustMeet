@@ -33,8 +33,8 @@ void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
         auto button_create_profile = std::make_shared<TgBot::InlineKeyboardButton>();
         button_create_profile->text = "Создать профиль";
         button_create_profile->callbackData = query::QRY_CREATE;
-
         keyboard->inlineKeyboard.push_back({button_create_profile});
+        
         bot->getApi().sendMessage(message->chat->id, "Привет, " + message->from->firstName + "! Эта часть ещё в разработке...", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters), keyboard);
     } else {
         auto user = database->get_user(message->from->id);
