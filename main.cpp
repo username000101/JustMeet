@@ -11,7 +11,7 @@ int main() {
     using justmeet::db::DatabaseManager;
     using justmeet::runtime_storage::bot;
     using justmeet::runtime_storage::database;
-    database = std::make_shared<justmeet::db::DatabaseManager>();
+    database = std::make_shared<DatabaseManager>();
     justmeet::utils::fscheck();
     justmeet::logic::bot_main();
     return 0;
