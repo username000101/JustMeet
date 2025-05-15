@@ -45,10 +45,7 @@ namespace justmeet {
 
                 std::string tg_first_name;
                 std::string tg_last_name;
-
-                std::string username;
                 std::int64_t chat_id;
-
                 std::string name;
                 std::uint16_t age;
                 std::string bio;
@@ -101,6 +98,7 @@ namespace justmeet {
             std::optional<std::string> get_field(std::int64_t chat_id, const std::string& field);
             std::optional<DatabaseUser> get_user(std::int64_t chat_id);
             std::optional<DatabaseUser> update_user(DatabaseUser user);
+            std::vector<DatabaseUser> find_users(const std::string& pattern);
 
             bool add_user(DatabaseUser& user);
             bool delete_user(std::int64_t chat_id);
