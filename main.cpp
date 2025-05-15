@@ -12,7 +12,7 @@ int main() {
     using justmeet::runtime_storage::bot;
     using justmeet::runtime_storage::database;
     database = std::make_shared<justmeet::db::DatabaseManager>();
-    utils::fscheck();
+    justmeet::utils::fscheck();
     justmeet::logic::bot_main();
     return 0;
 }
