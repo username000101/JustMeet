@@ -11,7 +11,7 @@ bool justmeet::db::DatabaseManager::check_user(std::int64_t chat_id) {
         return false;
     }
 
-    auto reply = (redisReply*)redisCommand(this->redis_, "hgetall %s", std::to_string(chat_id).c_str());
+    auto reply = (redisReply*)redisCommand(this->redis_, "hgetall user:%s", std::to_string(chat_id).c_str());
     if (reply->type == REDIS_REPLY_NIL)
         return false;
     else {
