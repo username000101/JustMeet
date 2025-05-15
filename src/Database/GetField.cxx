@@ -6,7 +6,7 @@
 #include <unicode/urename.h>
 
 std::optional<std::string> justmeet::db::DatabaseManager::get_field(std::int64_t chat_id, const std::string& field) {
-    const char* format = "hget %s %s";
+    const char* format = "hget user:%s %s";
     auto reply = (redisReply*)redisCommand(this->redis_,
                                            format,
                                            std::to_string(chat_id).c_str(),

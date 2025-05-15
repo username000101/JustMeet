@@ -10,7 +10,7 @@ bool justmeet::db::DatabaseManager::unban_user(std::int64_t chat_id) {
     }
 
     if (this->check_user(chat_id)) {
-        auto reply = (redisReply*)redisCommand(this->redis_, "hget %s banned", std::to_string(chat_id).c_str());
+        auto reply = (redisReply*)redisCommand(this->redis_, "hget user:%s banned", std::to_string(chat_id).c_str());
         if (reply->type == REDIS_REPLY_NIL) {
             this->logger_->warn("{} ==> {} ==> The user is not banned",
                                 __PRETTY_FUNCTION__, chat_id);
