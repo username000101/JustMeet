@@ -17,6 +17,12 @@ void justmeet::logic::bot_main(const std::string& token) {
         ("Bot", spdlog::sinks_init_list{std::make_shared<spdlog::sinks::stdout_color_sink_mt>()});
     runtime_storage::bot = std::make_shared<TgBot::Bot>(token);
 
+#ifndef NDEBUG
+    spdlog::set_level(spdlog::level::debug);
+#else
+    spdlog::set_level(spdlog::level::info);
+#endif
+
     runtime_storage::bot->getEvents().onNonCommandMessage(handlers::non_command_messages_handler);
     runtime_storage::bot->getEvents().onCallbackQuery(handlers::query::generic_query_handler);
     runtime_storage::bot->getEvents().onCommand("start", handlers::commands::start);
