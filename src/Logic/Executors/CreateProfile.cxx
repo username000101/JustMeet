@@ -38,6 +38,12 @@ void justmeet::logic::executors::create_profile(TgBot::CallbackQuery::Ptr query)
         case CITY:
             bot->getApi().editMessageText("А сейчас, пожалуйста, перечисли(через пробел) возраста, которые ты предпочитаешь(люди таких возрастов будут чаще попадаться)", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
             break;
+        case PREFERRED_AGES:
+            bot->getApi().editMessageText("А сейчас нужно перечислить предпочитаемые города(с переносом строки)(люди из этих городов будут попадаться тебе). Пример:\nМосква\nСанкт-Петербург\nНовосибирск", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
+            break;
+        case PREFERRED_CITIES:
+            bot->getApi().editMessageText("В данный момент тебе нужно скинуть фото/видео, которые будут.. показываться вместе с остальной информацией(?)(если хочешь скинуть несколько - отправляй группой)", query->message->chat->id, query->message->messageId, "", "", nullptr, keyboard);
+            break;
         default:
             bot->getApi().answerCallbackQuery(query->id, "Ничего не произошло :(", true);
             break;
