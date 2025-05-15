@@ -16,6 +16,9 @@ void justmeet::logic::handlers::commands::start(TgBot::Message::Ptr message) {
     if (!message)
         return;
 
+    database->add_field(message->from->id, "tg_first_name", message->from->firstName);
+    database->add_field(message->from->id, "tg_last_name", message->from->lastName);
+
     auto reply_parameters = std::make_shared<TgBot::ReplyParameters>
         (message->messageId, message->chat->id);
 
