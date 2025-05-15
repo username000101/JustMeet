@@ -72,16 +72,14 @@ std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::Databas
                             __PRETTY_FUNCTION__, chat_id);
         return std::nullopt;
     } else {
-        auto reply = (redisReply*)redisCommand(this->redis_, "hgetall %s", std::to_string(chat_id).c_str());
+        auto reply = (redisReply*)redisCommand(this->redis_, "hgetall user:%s", std::to_string(chat_id).c_str());
         if (reply->type == REDIS_REPLY_ARRAY) {
             DatabaseManager::DatabaseUser result;
-            for (std::size_t i = 0; reply->element[i] && reply->element[i + 1]; i += 2) {
+            for (std::size_t i = 0; i + 1 < reply->elements; i += 2) {
                 if (std::strcmp(reply->element[i]->str, "tg_first_name") == 0)
                     result.tg_first_name = reply->element[i + 1]->str;
                 else if (std::strcmp(reply->element[i]->str, "tg_last_name") == 0)
                     result.tg_last_name = reply->element[i + 1]->str;
-                else if (std::strcmp(reply->element[i]->str, "username") == 0)
-                    result.username = reply->element[i + 1]->str;
                 else if (std::strcmp(reply->element[i]->str, "name") == 0)
                     result.name = reply->element[i + 1]->str;
                 else if (std::strcmp(reply->element[i]->str, "age") == 0)
