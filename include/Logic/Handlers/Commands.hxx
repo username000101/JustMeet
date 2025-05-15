@@ -11,6 +11,7 @@ namespace justmeet {
                 void start(TgBot::Message::Ptr message);
                 void help(TgBot::Message::Ptr message);
                 void execute(TgBot::Message::Ptr message);
+                void find(TgBot::Message::Ptr message);
             }
         }
     }
