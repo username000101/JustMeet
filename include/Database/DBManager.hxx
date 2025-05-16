@@ -97,7 +97,6 @@ namespace justmeet {
 
             std::optional<std::string> get_field(std::int64_t chat_id, const std::string& field);
             std::optional<DatabaseUser> get_user(std::int64_t chat_id);
-            std::optional<DatabaseUser> update_user(DatabaseUser user);
             std::vector<DatabaseUser> find_users(const std::string& pattern);
 
             bool add_user(DatabaseUser& user);
@@ -112,13 +111,8 @@ namespace justmeet {
             bool delete_field(std::int64_t chat_id, const std::string& name);
             bool check_field(std::int64_t chat_id, const std::string& field);
 
-            /*DatabaseUserPreview operator[](std::int64_t chat_id) {
-                if (!this->connection_.is_open())
-                    throw std::runtime_error("Attempt to use DatabaseManager when connection is closed");
-                return {chat_id, this};
-            }*/
-                template <typename... ArgType> redisReply* call_custom_redis_command(ArgType&&... args) {
-                return (redisReply*)redisCommand(this->redis_, std::forward<ArgType>(args)...);
+            template <typename... ArgType> redisReply* call_custom_redis_command(ArgType&&... args) {
+                return static_cast<redisReply*>(redisCommand(this->redis_, std::forward<ArgType>(args)...));
             }
 
             private:
