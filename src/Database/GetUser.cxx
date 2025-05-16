@@ -72,7 +72,7 @@ std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::Databas
                             __PRETTY_FUNCTION__, chat_id);
         return std::nullopt;
     } else {
-        auto reply = (redisReply*)redisCommand(this->redis_, "hgetall user:%s", std::to_string(chat_id).c_str());
+        const auto reply = static_cast<redisReply*>(redisCommand(this->redis_, "hgetall user:%s", std::to_string(chat_id).c_str()));
         if (reply->type == REDIS_REPLY_ARRAY) {
             DatabaseManager::DatabaseUser result;
             for (std::size_t i = 0; i + 1 < reply->elements; i += 2) {

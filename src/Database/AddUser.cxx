@@ -38,7 +38,7 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
 
         const char* format = "hset %s tg_first_name %s tg_last_name %s name %s age %d gender %d bio %s language %d city %s profile_state %d preferred_ages %s preferred_genders %s preferred_languages %s preferred_cities %s media %s";
 
-        redisReply* reply = (redisReply*)redisCommand(this->redis_,
+        const auto reply = static_cast<redisReply*>(redisCommand(this->redis_,
                                                         format,
                                                         ("user:" + std::to_string(user.chat_id)).c_str(),
                                                         user.tg_first_name.c_str(),
@@ -54,7 +54,7 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
                                                         preferred_genders.c_str(),
                                                         preferred_languages.c_str(),
                                                         preferred_cities.c_str(),
-                                                        media.c_str());
+                                                        media.c_str()));
         if (reply->type == REDIS_REPLY_INTEGER) {
             this->logger_->info("{} ==> {} ==> The user has been added",
                                 __PRETTY_FUNCTION__, user.chat_id);

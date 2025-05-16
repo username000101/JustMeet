@@ -7,10 +7,10 @@
 
 std::optional<std::string> justmeet::db::DatabaseManager::get_field(std::int64_t chat_id, const std::string& field) {
     const char* format = "hget user:%s %s";
-    auto reply = (redisReply*)redisCommand(this->redis_,
+    const auto reply = static_cast<redisReply*>(redisCommand(this->redis_,
                                            format,
                                            std::to_string(chat_id).c_str(),
-                                             field.c_str());
+                                             field.c_str()));
     if (reply->type == REDIS_REPLY_NIL || reply->type == REDIS_REPLY_ERROR)
         return std::nullopt;
     else {

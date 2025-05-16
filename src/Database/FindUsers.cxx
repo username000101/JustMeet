@@ -6,9 +6,9 @@ std::vector<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::DatabaseM
     std::vector<DatabaseUser> users;
 
     const char* format = "ft.search users %s RETURN 0";
-    auto reply = (redisReply*)redisCommand(this->redis_,
+    const auto reply = static_cast<redisReply*>(redisCommand(this->redis_,
                                            format,
-                                           pattern.c_str());
+                                           pattern.c_str()));
     if (reply->type == REDIS_REPLY_NIL || reply->type == REDIS_REPLY_ERROR)
         return {};
     if (reply->elements > 0) {
