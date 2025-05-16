@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include <hiredis/hiredis.h>
-
 #include "Logic/Bot.hxx"
 #include "Database/DBManager.hxx"
 #include "Utils/FS.hxx"
