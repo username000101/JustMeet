@@ -58,6 +58,7 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
         if (reply->type == REDIS_REPLY_INTEGER) {
             this->logger_->info("{} ==> {} ==> The user has been added",
                                 __PRETTY_FUNCTION__, user.chat_id);
+            freeReplyObject(reply);
             return true;
         } else {
             this->logger_->error("{} ==> {} ==> Redis error, some info:"
@@ -67,6 +68,7 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
                                  user.chat_id,
                                  reply->type,
                                  reply->str);
+            freeReplyObject(reply);
             return false;
         }
     }

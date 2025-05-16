@@ -18,17 +18,22 @@ bool justmeet::db::DatabaseManager::ban_user(std::int64_t chat_id) {
             if (reply2->type == REDIS_REPLY_INTEGER && reply2->integer > 0) {
                 this->logger_->info("{} ==> {} ==> Banned user",
                                 __PRETTY_FUNCTION__, chat_id);
+                freeReplyObject(reply);
+                freeReplyObject(reply2);
                 return true;
             } else {
                 this->logger_->error("{} ==> {} ==> Redis error: {}",
                                      __PRETTY_FUNCTION__,
                                      chat_id,
                                      this->redis_->errstr);
+                freeReplyObject(reply);
+                freeReplyObject(reply2);
                 return false;
             }
         } else {
             this->logger_->warn("{} ==> {} ==> The user is already banned",
                                 __PRETTY_FUNCTION__, chat_id);
+            freeReplyObject(reply);
             return true;
         }
     } else {

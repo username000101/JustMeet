@@ -17,8 +17,10 @@ bool justmeet::db::DatabaseManager::delete_user(std::int64_t chat_id) {
             if (reply->integer < 1) /* Error(?) */ {
                 this->logger_->error("{} ==> Redis error: ",
                                      __PRETTY_FUNCTION__, this->redis_->errstr);
+                freeReplyObject(reply);
                 return false;
             }
+        freeReplyObject(reply);
         return true;
     } else
         return true;

@@ -9,8 +9,10 @@ std::vector<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::DatabaseM
     const auto reply = static_cast<redisReply*>(redisCommand(this->redis_,
                                            format,
                                            pattern.c_str()));
-    if (reply->type == REDIS_REPLY_NIL || reply->type == REDIS_REPLY_ERROR)
+    if (reply->type == REDIS_REPLY_NIL || reply->type == REDIS_REPLY_ERROR) {
+        freeReplyObject(reply);
         return {};
+    }
     if (reply->elements > 0) {
         for (std::uint32_t i = 0; i < reply->elements; ++i) {
             if (reply->element[i]->type == REDIS_REPLY_STRING) {
@@ -30,7 +32,10 @@ std::vector<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::DatabaseM
                                         __PRETTY_FUNCTION__, reply->element[i]->str);
             }
         }
+        freeReplyObject(reply);
         return users;
-    } else
+    } else {
+        freeReplyObject(reply);
         return {};
+    }
 }

@@ -85,11 +85,9 @@ std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::Databas
                 else if (std::strcmp(reply->element[i]->str, "age") == 0)
                     result.age = reply->element[i + 1]->integer;
                 else if (std::strcmp(reply->element[i]->str, "gender") == 0)
-                    result.gender = static_cast<DatabaseManager::DatabaseUser::DatabaseUserGender>(reply->element[i + 1]->integer);
+                    result.gender = static_cast<DatabaseUser::DatabaseUserGender>(reply->element[i + 1]->integer);
                 else if (std::strcmp(reply->element[i]->str, "bio") == 0)
                     result.bio = reply->element[i + 1]->str;
-                else if (std::strcmp(reply->element[i]->str, "language") == 0)
-                    result.language = static_cast<DatabaseManager::DatabaseUser::DatabaseUserLanguage>(reply->element[i + 1]->integer);
                 else if (std::strcmp(reply->element[i]->str, "city") == 0)
                     result.city = reply->element[i + 1]->str;
                 else if (std::strcmp(reply->element[i]->str, "profile_state") == 0)
@@ -105,10 +103,12 @@ std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::Databas
                 else if (std::strcmp(reply->element[i]->str, "media") == 0)
                     result.media = cast_media(reply->element[i + 1]->str);
             }
+            freeReplyObject(reply);
             return result;
         } else {
             this->logger_->warn("{} ==> {} ==> Unexpected reply: {}",
                                 __PRETTY_FUNCTION__, chat_id, reply->type);
+            freeReplyObject(reply);
             return std::nullopt;
         }
     }

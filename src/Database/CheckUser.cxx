@@ -12,17 +12,21 @@ bool justmeet::db::DatabaseManager::check_user(std::int64_t chat_id) {
     }
 
     const auto reply = static_cast<redisReply*>(redisCommand(this->redis_, "hgetall user:%s", std::to_string(chat_id).c_str()));
-    if (reply->type == REDIS_REPLY_NIL)
+    if (reply->type == REDIS_REPLY_NIL) {
+        freeReplyObject(reply);
         return false;
-    else {
+    } else {
         if (reply->type == REDIS_REPLY_ARRAY) {
-            if (reply->elements == 0)
+            if (reply->elements == 0) {
                 return false;
-            else
+            } else {
+                freeReplyObject(reply);
                 return true;
+            }
         } else {
             this->logger_->warn("{} ==> Unexpected reply type",
                                 __PRETTY_FUNCTION__);
+            freeReplyObject(reply);
             return false;
         }
     }

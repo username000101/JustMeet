@@ -12,11 +12,13 @@ bool justmeet::db::DatabaseManager::add_field(std::int64_t chat_id, const std::s
         this->logger_->log(spdlog::level::info,
                            "{} ==> Added field to key {}: {}: {}",
                            __PRETTY_FUNCTION__, chat_id, name, value);
+        freeReplyObject(reply);
         return true;
     } else {
         this->logger_->log(spdlog::level::warn,
                            "{} ==> Failed to add field to key {}: {}: {}: redisReply::type is {}",
                            __PRETTY_FUNCTION__, chat_id, name, value, reply->type);
+        freeReplyObject(reply);
         return false;
     }
 }

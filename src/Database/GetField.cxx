@@ -11,14 +11,21 @@ std::optional<std::string> justmeet::db::DatabaseManager::get_field(std::int64_t
                                            format,
                                            std::to_string(chat_id).c_str(),
                                              field.c_str()));
-    if (reply->type == REDIS_REPLY_NIL || reply->type == REDIS_REPLY_ERROR)
+    if (reply->type == REDIS_REPLY_NIL || reply->type == REDIS_REPLY_ERROR) {
+        freeReplyObject(reply);
         return std::nullopt;
-    else {
+    } else {
         switch (reply->type) {
-            case REDIS_REPLY_STRING:
-                return (reply->str ? reply->str : "char* == nullptr");
-            case REDIS_REPLY_INTEGER:
-                return std::to_string(reply->integer);
+            case REDIS_REPLY_STRING: {
+                std::string str_cpy = (reply->str ? reply->str : "char* == nullptr");
+                freeReplyObject(reply);
+                return str_cpy;
+            }
+            case REDIS_REPLY_INTEGER: {
+                auto int_cpy = (reply->integer ? std::to_string(reply->integer) : "0");
+                freeReplyObject(reply);
+                return int_cpy;
+            }
             case REDIS_REPLY_ARRAY: {
                 std::string array_str;
                 for (auto element = 0; element != reply->elements; ++element)
@@ -49,14 +56,19 @@ std::optional<std::string> justmeet::db::DatabaseManager::get_field(std::int64_t
                         }
                         array_str.append(")");
                     }
+                freeReplyObject(reply);
                 return array_str;
             }
             case REDIS_REPLY_NIL:
+                freeReplyObject(reply);
                 return std::nullopt;
             case REDIS_REPLY_ERROR:
+                freeReplyObject(reply);
                 return std::nullopt;
             default:
+                freeReplyObject(reply);
                 return std::nullopt;
         }
     }
+    return std::nullopt;
 }
