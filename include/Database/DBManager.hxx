@@ -60,12 +60,18 @@ namespace justmeet {
 
                 this->redis_ = redisConnect("localhost", 6379);
                 if (!this->redis_) {
-                    this->logger_->critical("{} ==> {} {}",
+                    this->logger_->critical("{} ==> {}",
                                      __PRETTY_FUNCTION__,
-                                     "Redis connection failed: ",
-                                     this->redis_->errstr);
+                                     "Redis context is null");
                     std::exit(1);
-                }
+                } else
+                    if (this->redis_->err != 0) {
+                        this->logger_->critical("{} ==> Connection error(maybe redis server is not running?): {}: {}",
+                                                __PRETTY_FUNCTION__,
+                                                this->redis_->err,
+                                                this->redis_->errstr);
+                        std::exit(1);
+                    }
             }
 
             ~DatabaseManager() {
