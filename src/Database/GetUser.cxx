@@ -15,7 +15,6 @@ using justmeet::db::DatabaseManager;
 using justmeet::utils::cast_container;
 using justmeet::utils::string_reader;
 
-using cast_pref_langs_rt = std::vector<DatabaseManager::DatabaseUser::DatabaseUserLanguage>;
 using cast_pref_ages_rt = std::vector<std::uint16_t>;
 using cast_pref_genders_rt = std::vector<DatabaseManager::DatabaseUser::DatabaseUserGender>;
 using cast_pref_cities_rt = std::vector<std::string>;
@@ -39,15 +38,6 @@ cast_pref_genders_rt cast_preferred_genders(const std::string& str_preferred_gen
     return result;
 }
 
-cast_pref_langs_rt cast_preferred_languages(const std::string& str_preferred_languages) {
-    cast_pref_langs_rt result;
-    auto casted = string_reader(str_preferred_languages);
-    std::for_each(casted.begin(), casted.end(), [&result](auto&& value) {
-        result.push_back(static_cast<DatabaseManager::DatabaseUser::DatabaseUserLanguage>(std::stoi(value)));
-    });
-    return result;
-}
-
 cast_pref_cities_rt cast_preferred_cities(const std::string& str_preferred_cities) {
     return string_reader(str_preferred_cities);
 }
@@ -62,11 +52,6 @@ cast_media_rt cast_media(const std::string& str_media) {
 }
 
 std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::DatabaseManager::get_user(std::int64_t chat_id) {
-    using v_genders = std::vector<DatabaseManager::DatabaseUser::DatabaseUserGender>;
-    using v_langs = std::vector<DatabaseManager::DatabaseUser::DatabaseUserLanguage>;
-    using v_str = std::vector<std::string>;
-    using v_path = std::vector<std::filesystem::path>;
-
     if (!this->check_user(chat_id)) {
         this->logger_->warn("{} ==> {} ==> Can't find the user",
                             __PRETTY_FUNCTION__, chat_id);
@@ -96,8 +81,6 @@ std::optional<justmeet::db::DatabaseManager::DatabaseUser> justmeet::db::Databas
                     result.preferred_ages = cast_preferred_ages(reply->element[i + 1]->str);
                 else if (std::strcmp(reply->element[i]->str, "preferred_genders") == 0)
                     result.preferred_genders = cast_preferred_genders(reply->element[i + 1]->str);
-                else if (std::strcmp(reply->element[i]->str, "preferred_languages") == 0)
-                    result.preferred_languages = cast_preferred_languages(reply->element[i + 1]->str);
                 else if (std::strcmp(reply->element[i]->str, "preferred_cities") == 0)
                     result.preferred_cities = cast_preferred_cities(reply->element[i + 1]->str);
                 else if (std::strcmp(reply->element[i]->str, "media") == 0)

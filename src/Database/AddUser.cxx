@@ -16,7 +16,6 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
     using v_u16 = std::vector<std::uint16_t>;
     using v_str = std::vector<std::string>;
     using v_genders = std::vector<DatabaseManager::DatabaseUser::DatabaseUserGender>;
-    using v_langs = std::vector<DatabaseManager::DatabaseUser::DatabaseUserLanguage>;
     using v_path = std::vector<std::filesystem::path>;
 
     if (!this->redis_) {
@@ -32,11 +31,10 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
     } else {
         auto preferred_ages = container_reader<v_u16>(user.preferred_ages);
         auto preferred_genders = container_reader<v_int>(cast_container<v_genders, v_int>(user.preferred_genders));
-        auto preferred_languages = container_reader<v_int>(cast_container<v_langs, v_int>(user.preferred_languages));
         auto preferred_cities = container_reader<v_str>(user.preferred_cities);
         auto media = container_reader<v_str>(cast_container<v_path, v_str>(user.media));
 
-        const char* format = "hset %s tg_first_name %s tg_last_name %s name %s age %d gender %d bio %s language %d city %s profile_state %d preferred_ages %s preferred_genders %s preferred_languages %s preferred_cities %s media %s";
+        const char* format = "hset %s tg_first_name %s tg_last_name %s name %s age %d gender %d bio %s city %s profile_state %d preferred_ages %s preferred_genders %s preferred_cities %s media %s";
 
         const auto reply = static_cast<redisReply*>(redisCommand(this->redis_,
                                                         format,
@@ -47,12 +45,10 @@ bool justmeet::db::DatabaseManager::add_user(justmeet::db::DatabaseManager::Data
                                                         user.age,
                                                         static_cast<int>(user.gender),
                                                         user.bio.c_str(),
-                                                        static_cast<int>(user.language),
                                                         user.city.c_str(),
                                                         static_cast<int>(user.profile_state),
                                                         preferred_ages.c_str(),
                                                         preferred_genders.c_str(),
-                                                        preferred_languages.c_str(),
                                                         preferred_cities.c_str(),
                                                         media.c_str()));
         if (reply->type == REDIS_REPLY_INTEGER) {

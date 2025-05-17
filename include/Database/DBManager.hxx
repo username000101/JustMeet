@@ -22,13 +22,6 @@ namespace justmeet {
                     FEMALE = 1,
                 };
 
-                enum DatabaseUserLanguage {
-                    Russian = 0,
-                    English = 1,
-                    French  = 2,
-                    Deutch  = 3,
-                };
-
                 enum UserProfileState {
                     NONE,
                     NAME,
@@ -50,29 +43,15 @@ namespace justmeet {
                 std::uint16_t age;
                 std::string bio;
                 DatabaseUserGender gender;
-                DatabaseUserLanguage language;
                 std::string city;
                 UserProfileState profile_state;
 
                 std::vector<std::uint16_t> preferred_ages;
-                std::vector<DatabaseUserLanguage> preferred_languages;
                 std::vector<std::string> preferred_cities;
                 std::vector<DatabaseUserGender> preferred_genders;
 
                 std::vector<std::filesystem::path> media;
             };
-
-            struct DatabaseUserPreview {
-                DatabaseUserPreview(std::int64_t chat_id, DatabaseManager* db) : user_chat_id_(chat_id) {}
-
-                std::optional<DatabaseUser> get() { return this->db_ptr_->get_user(this->user_chat_id_); }
-                bool remove() { return this->db_ptr_->delete_user(this->user_chat_id_); }
-            private:
-                DatabaseManager* db_ptr_;
-                std::int64_t user_chat_id_;
-            };
-
-            enum DatabaseOperation { GET, DELETE, ADD, UPDATE, BAN, UNBAN, CHECK, };
 
             DatabaseManager() {
                 this->logger_ = std::make_shared<spdlog::logger>("DatabaseManager",
@@ -92,7 +71,6 @@ namespace justmeet {
             ~DatabaseManager() {
                 if (this->redis_)
                     redisFree(this->redis_);
-
             }
 
             std::optional<std::string> get_field(std::int64_t chat_id, const std::string& field);
@@ -110,6 +88,7 @@ namespace justmeet {
             bool add_field(std::int64_t chat_id, const std::string& name, const std::string& value);
             bool delete_field(std::int64_t chat_id, const std::string& name);
             bool check_field(std::int64_t chat_id, const std::string& field);
+            bool check_is_user_viewed(std::int64_t chat_id, std::int64_t req_chat_id);
 
             template <typename... ArgType> redisReply* call_custom_redis_command(ArgType&&... args) {
                 return static_cast<redisReply*>(redisCommand(this->redis_, std::forward<ArgType>(args)...));
