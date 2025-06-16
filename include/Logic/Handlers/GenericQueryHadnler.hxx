@@ -9,6 +9,7 @@ namespace justmeet {
     namespace logic {
         namespace handlers {
             namespace query {
+                constexpr std::string intrnl__QRY_GENDER_DEFINE = "qry_gdr";
                 constexpr std::string QRY_WARN = "qry_wrn"; /* For make warnings */
                 constexpr std::string QRY_LOG = "qry_log"; /* For making a log messages */
                 constexpr std::string QRY_REPORT = "qry_rep"; /* For making a report */

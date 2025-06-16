@@ -42,9 +42,7 @@ std::string download_media(TgBot::Document::Ptr media) { return intrnl__download
 
 void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr message) {
     using runtime_storage::database;
-    using query::QRY_SET;
-    using query::QRY_CREATE;
-    using query::QRY_WARN;
+    using namespace query;
     using executors::CreateProfileStep;
 
     auto reply_parameters = std::make_shared<TgBot::ReplyParameters>
@@ -101,15 +99,48 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
             break;
         }
         case CreateProfileStep::BIO: {
-            database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::CITY));
+            database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::GENDER));
             database->add_field(message->from->id, "bio", message->text);
 
             bot->getApi().deleteMessage(message->chat->id, message->messageId);
 
+
+            auto keyboard_ = std::make_shared<TgBot::InlineKeyboardMarkup>();
+
+            auto button_gender_male = std::make_shared<TgBot::InlineKeyboardButton>();
+            button_gender_male->text = "Мужской";
+            button_gender_male->callbackData = intrnl__QRY_GENDER_DEFINE + " male";
+            keyboard_->inlineKeyboard.push_back({button_gender_male});
+
+            auto button_gender_female = std::make_shared<TgBot::InlineKeyboardButton>();
+            button_gender_female->text = "Женский";
+            button_gender_female->callbackData = intrnl__QRY_GENDER_DEFINE + " female";
+            keyboard_->inlineKeyboard.push_back({button_gender_female});
+
             if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
-                bot->getApi().editMessageText("Охты, ну а теперь напиши свой город(в идеале точное название, например: не Спб, а Санкт-Питербург, или что-то в этом роде)", message->chat->id, std::stoi(value.value()));
+                bot->getApi().editMessageText("Вау, а теперь выбери свой пол", message->chat->id, std::stoi(value.value()), "", "", nullptr, keyboard_);
             else
-                bot->getApi().sendMessage(message->chat->id, "Охты, ну а теперь напиши свой город(в идеале точное название, например: не Спб, а Санкт-Питербург, или что-то в этом роде)", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+                bot->getApi().sendMessage(message->chat->id, "Вау, а теперь выбери свой пол", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters), keyboard_);
+            break;
+        }
+
+        case CreateProfileStep::GENDER: {
+            database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::CITY));
+
+            if (!database->get_field(message->from->id, "gender_defined_no_delete_msg").has_value()) {
+                spdlog::warn("{} ==> Someting is wrong(?)");
+                /* TODO:
+                 * Add reporting
+                 */
+                std::exit(1);
+            } else {
+                database->delete_field(message->from->id, "gender_defined_no_delete_msg");
+
+                if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                    bot->getApi().editMessageText("Охты, ну а теперь напиши свой город(в идеале точное название, например: не Спб, а Санкт-Питербург, или что-то в этом роде)", message->chat->id, std::stoi(value.value()));
+                else
+                    bot->getApi().sendMessage(message->chat->id, "Охты, ну а теперь напиши свой город(в идеале точное название, например: не Спб, а Санкт-Питербург, или что-то в этом роде)", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            }
             break;
         }
         case CreateProfileStep::CITY: {
@@ -117,6 +148,7 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
             database->add_field(message->from->id, "city", message->text);
 
             bot->getApi().deleteMessage(message->chat->id, message->messageId);
+
 
             if (auto value = database->get_field(message->chat->id,  "last_msg_query_id"); value.has_value())
                 bot->getApi().editMessageText("Окей, учтём. А сейчас, пожалуйста, перечисли(через пробел) возраста, которые ты предпочитаешь(люди таких возрастов будут чаще попадаться)", message->chat->id, std::stoi(value.value()));
@@ -144,14 +176,16 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
             }
 
             database->add_field(message->from->id, "preferred_ages", utils::container_reader<decltype(preferred_ages)>(preferred_ages));
-            if (!errors_buffer.empty())
+            if (!errors_buffer.empty()) {
                 if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
                     bot->getApi().editMessageText(errors_buffer + "\n\n" + new_msg_text, message->chat->id, std::stoi(value.value()));
                 else bot->getApi().sendMessage(message->chat->id, errors_buffer + "\n\n" + new_msg_text, nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
-                    if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
-                        bot->getApi().editMessageText(new_msg_text, message->chat->id, std::stoi(value.value()));
-                    else
-                        bot->getApi().sendMessage(message->chat->id, new_msg_text, nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            } else {
+                if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                    bot->getApi().editMessageText(new_msg_text, message->chat->id, std::stoi(value.value()));
+                else
+                    bot->getApi().sendMessage(message->chat->id, new_msg_text, nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+            }
             break;
         }
 
@@ -179,6 +213,12 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
                 database->delete_field(message->from->id, "latest_media_group_length");
             };
 
+            TgBot::Message::Ptr load_file_info_msg = nullptr;
+            if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
+                bot->getApi().editMessageText("Загрузка файла...", message->chat->id, std::stoi(value.value()));
+            else
+                load_file_info_msg = bot->getApi().sendMessage(message->chat->id, "Загрузка файла...", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+
             std::string content;
             if (message->mediaGroupId.empty()) {
                 if (!message->photo.empty())
@@ -189,7 +229,6 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
                             bot->getApi().editMessageText("Видео слишком длинное(максимальная длина видео - " + std::to_string(VIDEO_DURATION_LIMIT) + " секунд)", message->chat->id, std::stoi(value.value()));
                         else
                             bot->getApi().sendMessage(message->chat->id, "Видео слишком длинное(максимальная длина видео - " + std::to_string(VIDEO_DURATION_LIMIT) + " секунд)", nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
-                        database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::END));
                         return;
                     }
                     content = download_media(message->video);
@@ -209,18 +248,21 @@ void justmeet::logic::handlers::non_command_messages_handler(TgBot::Message::Ptr
                     } else content = download_media(message->document);
                 }
 
+                if (load_file_info_msg)
+                    bot->getApi().deleteMessage(load_file_info_msg->chat->id, load_file_info_msg->messageId);
+
                 std::ofstream outfile(FILES_FOLDER + std::string("/") + std::to_string(message->from->id) + "/media/media_" + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count()));
                 if (content.empty())
                     return;
-                outfile.write(content.c_str(), content.size());
+                outfile.write(content.c_str(), static_cast<std::streamsize>(content.size()));
+                bot->getApi().deleteMessage(message->chat->id, message->messageId);
                 if (auto value = database->get_field(message->chat->id, "last_msg_query_id"); value.has_value())
                     bot->getApi().editMessageText("Файл был успешно добавлен! Лимит: 1/" + std::to_string(MEDIA_LIMIT), message->chat->id, std::stoi(value.value()));
                 else
                     bot->getApi().sendMessage(message->chat->id, "Файл был успешно добавлен! Лимит: 1/" + std::to_string(MEDIA_LIMIT), nullptr, (database->get_field(0, "safe_mode").has_value() ? nullptr : reply_parameters));
+                database->add_field(message->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::END));
                 return;
             }
-
-            bot->getApi().deleteMessage(message->chat->id, message->messageId);
         }
     }
 }

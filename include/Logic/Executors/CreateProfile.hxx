@@ -10,6 +10,7 @@ namespace justmeet {
                 NAME,
                 AGE,
                 BIO,
+                GENDER,
                 CITY,
                 PREFERRED_AGES,
                 PREFERRED_CITIES,

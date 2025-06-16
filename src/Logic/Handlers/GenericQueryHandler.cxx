@@ -1,5 +1,7 @@
 #include "Logic/Handlers/GenericQueryHadnler.hxx"
 
+#include <algorithm>
+#include <ranges>
 #include <sstream>
 #include <unordered_map>
 
@@ -8,6 +10,8 @@
 
 #include "Runtime/Storage.hxx"
 #include "Logic/Executors/CreateProfile.hxx"
+#include "Logic/Handlers/NonCommandMessagesHandler.hxx"
+#include "Runtime/Storage.hxx"
 
 std::unordered_map<std::string, justmeet::logic::handlers::query::ExecutorSignature> executors = {
     {justmeet::logic::handlers::query::QRY_WARN, [] (TgBot::CallbackQuery::Ptr query) {
@@ -34,7 +38,31 @@ std::unordered_map<std::string, justmeet::logic::handlers::query::ExecutorSignat
             /* Unimplemented */
 #endif
         }
-    }
+    },
+
+    {justmeet::logic::handlers::query::QRY_SET, [] (TgBot::CallbackQuery::Ptr query) {
+
+        }
+    },
+
+    {justmeet::logic::handlers::query::intrnl__QRY_GENDER_DEFINE, [] (TgBot::CallbackQuery::Ptr query) {
+            using justmeet::runtime_storage::database;
+            using justmeet::db::DatabaseManager;
+            using justmeet::logic::executors::CreateProfileStep;
+
+            std::string command_buf, value_buf;
+            std::istringstream stream(query->data);
+            stream >> command_buf >> value_buf;
+            if (value_buf == "male")
+                database->add_field(query->from->id, "gender", std::to_string(DatabaseManager::DatabaseUser::DatabaseUserGender::MALE));
+            else
+                database->add_field(query->from->id, "gender", std::to_string(DatabaseManager::DatabaseUser::DatabaseUserGender::FEMALE));
+            database->add_field(query->from->id, "current_profile_create_step", std::to_string(CreateProfileStep::GENDER));
+            database->add_field(query->from->id, "gender_defined_no_delete_msg", "1");
+            query->message->from->id = query->message->chat->id;
+            justmeet::logic::handlers::non_command_messages_handler(query->message);
+        }
+    },
 };
 
 void justmeet::logic::handlers::query::add_executor(const std::string& command, justmeet::logic::handlers::query::ExecutorSignature executor) {

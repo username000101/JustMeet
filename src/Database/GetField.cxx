@@ -6,6 +6,8 @@
 #include <unicode/urename.h>
 
 std::optional<std::string> justmeet::db::DatabaseManager::get_field(std::int64_t chat_id, const std::string& field) {
+    spdlog::debug("{} ==> Getting field from key {}: {}",
+                  __PRETTY_FUNCTION__, chat_id, field);
     const char* format = "hget user:%s %s";
     const auto reply = static_cast<redisReply*>(redisCommand(this->redis_,
                                            format,

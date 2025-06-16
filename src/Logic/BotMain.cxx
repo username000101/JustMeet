@@ -26,6 +26,7 @@ void justmeet::logic::bot_main(const std::string& token) {
     runtime_storage::bot->getEvents().onNonCommandMessage(handlers::non_command_messages_handler);
     runtime_storage::bot->getEvents().onCallbackQuery(handlers::query::generic_query_handler);
     runtime_storage::bot->getEvents().onCommand("start", handlers::commands::start);
+    runtime_storage::bot->getEvents().onCommand("find", handlers::commands::find);
 
     if (runtime_storage::database->get_field(0, "safe_mode").has_value())
         spdlog::info("Running in safe mode! Some functions(like reply_parameters) are disabled");
